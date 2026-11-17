@@ -15,6 +15,7 @@ export default function Profil() {
   const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function Profil() {
       })
       await profilService.save(payload)
       setMessage({ type: 'success', text: 'Profil berhasil disimpan.' })
+      setEditing(false)
     } catch (err) {
       const errors = err.response?.data?.errors
       setMessage({ type: 'error', text: errors ? Object.values(errors).flat()[0] : err.response?.data?.message || 'Gagal menyimpan profil.' })
@@ -73,15 +75,38 @@ export default function Profil() {
 
   return (
     <DashboardLayout>
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Profil UMKM</h1>
-          <p className="mt-1 text-sm text-gray-500">Perbarui informasi usaha, kontak, foto, dan media sosial.</p>
+      <div className="mx-auto max-w-7xl space-y-6">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Profil UMKM</h1>
+            <p className="mt-1 text-sm text-gray-500">Informasi usaha, kontak, foto, dan media sosial.</p>
+          </div>
         </div>
 
-        {message.text && <div className={`rounded-lg p-4 text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>{message.text}</div>}
+        {message.text && <div className={`rounded-lg border p-4 text-sm ${message.type === 'success' ? 'border-green-100 bg-green-50 text-green-700' : 'border-red-100 bg-red-50 text-red-700'}`}>{message.text}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-5 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+        <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100 sm:p-8">
+          {preview && <img src={preview} alt="Foto usaha" className="mb-8 aspect-video w-full rounded-xl object-cover ring-1 ring-gray-200" />}
+          <div className="flex flex-col gap-5 border-b border-gray-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Nama Usaha</p>
+              <h2 className="mt-1 text-xl font-bold text-gray-900">{form.namaUMKM || 'Belum diisi'}</h2>
+              <p className="mt-4 text-sm text-gray-500">{form.deskripsi || 'Deskripsi usaha belum diisi.'}</p>
+            </div>
+            <button type="button" onClick={() => setEditing(true)} className="shrink-0 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">Edit Profil</button>
+          </div>
+          <dl className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Alamat</dt><dd className="mt-1 text-sm text-gray-700">{form.alamat || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Nomor Telepon</dt><dd className="mt-1 text-sm text-gray-700">{form.noTelepon || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Email Usaha</dt><dd className="mt-1 text-sm text-gray-700">{form.email || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Media Sosial</dt><dd className="mt-1 text-sm text-gray-700">{form.mediaSosial || '-'}</dd></div>
+          </dl>
+        </section>
+
+        {editing && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl sm:p-8">
+            <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4"><h2 className="text-xl font-bold text-gray-900">Edit Profil UMKM</h2><button type="button" onClick={() => setEditing(false)} className="rounded-lg px-2 text-2xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-600">&times;</button></div>
+            <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Nama Usaha</label>
@@ -120,8 +145,10 @@ export default function Profil() {
             </div>
           </div>
 
-          <button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">{saving ? 'Menyimpan...' : 'Simpan Profil'}</button>
-        </form>
+          <div className="flex gap-3"><button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">{saving ? 'Menyimpan...' : 'Simpan Profil'}</button><button type="button" onClick={() => setEditing(false)} className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button></div>
+            </form>
+          </div>
+        </div>}
       </div>
     </DashboardLayout>
   )

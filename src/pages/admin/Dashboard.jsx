@@ -1,21 +1,41 @@
+import { useEffect, useState } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { useAuth } from '../../contexts/AuthContext'
+import api from '../../services/api'
 
 const summaries = [
-  { label: 'Total Produk',       value: '0', icon: '▣', color: 'bg-blue-500'    },
-  { label: 'Kategori Produk',    value: '0', icon: '◈', color: 'bg-emerald-500' },
-  { label: 'Profil UMKM',        value: '1', icon: '◎', color: 'bg-violet-500'  },
-  { label: 'Laporan Keuangan',   value: '0', icon: '▤', color: 'bg-orange-500'  },
+  { key: 'produk', label: 'Total Produk', icon: '▣', color: 'bg-blue-500' },
+  { key: 'kategori', label: 'Kategori Produk', icon: '◈', color: 'bg-emerald-500' },
+  { key: 'profil', label: 'Profil UMKM', icon: '◎', color: 'bg-violet-500' },
+  { key: 'laporan', label: 'Laporan Keuangan', icon: '▤', color: 'bg-orange-500' },
 ]
 
-const activities = [
-  'Belum ada aktivitas produk.',
-  'Belum ada laporan keuangan.',
-  'Lengkapi profil UMKM Anda.',
-]
+const rupiah = (v) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(v)
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const [sessions, setSessions] = useState([])
+  const [stats, setStats] = useState({ produk: 0, kategori: 0, laporan: 0, totalModal: 0 })
+
+  useEffect(() => {
+    api.get('/auth/login-history').then(({ data }) => setSessions(data)).catch(() => {})
+    Promise.all([
+      api.get('/produk'),
+      api.get('/kategori'),
+      api.get('/laporan-keuangan'),
+    ]).then(([produkRes, kategoriRes, laporanRes]) => {
+      const laporan = laporanRes.data
+      const totalModal = laporan.reduce((saldo, item) => (
+        saldo + (item.jenis === 'Pemasukan' ? Number(item.jumlah) : -Number(item.jumlah))
+      ), 0)
+      setStats({
+        produk: produkRes.data.length,
+        kategori: kategoriRes.data.length,
+        laporan: laporan.length,
+        totalModal,
+      })
+    }).catch(() => {})
+  }, [])
 
   return (
     <DashboardLayout>
@@ -37,19 +57,31 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{item.label}</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900">{item.value}</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{item.key === 'profil' ? '1' : stats[item.key]}</p>
               </div>
             </article>
           ))}
         </section>
 
+        <section className="rounded-xl bg-indigo-600 p-5 text-white shadow-sm">
+          <p className="text-sm text-indigo-100">Total Saldo</p>
+          <p className="mt-1 text-2xl font-bold">{rupiah(stats.totalModal)}</p>
+        </section>
+
         {/* Panel bawah */}
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">Aktivitas Terbaru</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Riwayat Login</h2>
             <div className="mt-4 divide-y divide-gray-100">
-              {activities.map((a) => (
-                <p key={a} className="py-3 text-sm text-gray-500">{a}</p>
+              {sessions.length === 0 ? (
+                <p className="py-3 text-sm text-gray-500">Belum ada riwayat login.</p>
+              ) : sessions.map((s) => (
+                <div key={s.id} className="py-3">
+                  <p className="text-sm font-medium text-gray-700">
+                    {new Date(s.last_activity * 1000).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </p>
+                  <p className="text-xs text-gray-400">{s.ip_address} &mdash; {s.user_agent?.slice(0, 60)}…</p>
+                </div>
               ))}
             </div>
           </article>

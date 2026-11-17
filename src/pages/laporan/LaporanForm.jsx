@@ -8,7 +8,7 @@ export default function LaporanForm() {
   const { id } = useParams()
   const isEdit = Boolean(id)
 
-  const [form, setForm] = useState({ namaSumber: '', jumlah: '', tanggal: '', keterangan: '' })
+  const [form, setForm] = useState({ jenis: 'Pemasukan', namaSumber: '', jumlah: '', tanggal: '', keterangan: '' })
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(false)
   const [error, setError] = useState('')
@@ -17,7 +17,13 @@ export default function LaporanForm() {
     if (!isEdit) return
     setFetching(true)
     laporanService.getById(id)
-      .then((data) => setForm({ namaSumber: data.namaSumber, jumlah: String(data.jumlah), tanggal: data.tanggal, keterangan: data.keterangan || '' }))
+      .then((data) => setForm({
+        jenis: data.jenis || 'Pemasukan',
+        namaSumber: data.namaSumber || '',
+        jumlah: data.jumlah != null ? String(data.jumlah) : '',
+        tanggal: data.tanggal ? String(data.tanggal).slice(0, 10) : '',
+        keterangan: data.keterangan || '',
+      }))
       .catch(() => setError('Gagal memuat data laporan.'))
       .finally(() => setFetching(false))
   }, [id, isEdit])
@@ -27,6 +33,8 @@ export default function LaporanForm() {
     setForm((prev) => ({ ...prev, [name]: value }))
     setError('')
   }
+
+  const isPemasukan = form.jenis === 'Pemasukan'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -57,14 +65,48 @@ export default function LaporanForm() {
         {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-5 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+          {/* Jenis Toggle */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Nama Sumber Modal/Keuangan</label>
-            <input type="text" name="namaSumber" value={form.namaSumber} onChange={handleChange} required maxLength={100} placeholder="Contoh: Modal Sendiri, Pinjaman Bank, Hibah..." className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Jenis Transaksi</label>
+            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setForm(p => ({ ...p, jenis: 'Pemasukan' }))}
+                className={`flex-1 py-2 text-sm font-medium transition ${
+                  isPemasukan ? 'bg-green-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                ↑ Pemasukan Modal
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm(p => ({ ...p, jenis: 'Pengeluaran' }))}
+                className={`flex-1 py-2 text-sm font-medium transition ${
+                  !isPemasukan ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                ↓ Pengeluaran
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {isPemasukan ? 'Sumber Modal / Pemasukan' : 'Keperluan / Tujuan Pengeluaran'}
+            </label>
+            <input type="text" name="namaSumber" value={form.namaSumber} onChange={handleChange} required maxLength={100}
+              placeholder={isPemasukan ? 'Contoh: Modal Sendiri, Pinjaman Bank, Hibah...' : 'Contoh: Pembelian Bahan Baku, Biaya Operasional...'}
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Jumlah (Rp)</label>
-            <input type="number" name="jumlah" value={form.jumlah} onChange={handleChange} required min="0" placeholder="0" className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+            <input type="number" name="jumlah" value={form.jumlah} onChange={handleChange} required min="0" placeholder="0"
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
+                isPemasukan
+                  ? 'border-green-300 focus:border-green-500 focus:ring-green-500'
+                  : 'border-red-300 focus:border-red-400 focus:ring-red-400'
+              }`} />
           </div>
 
           <div>
@@ -78,7 +120,12 @@ export default function LaporanForm() {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="submit" disabled={loading} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">{loading ? 'Menyimpan...' : 'Simpan'}</button>
+            <button type="submit" disabled={loading}
+              className={`rounded-lg px-6 py-2 text-sm font-medium text-white disabled:opacity-50 ${
+                isPemasukan ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'
+              }`}>
+              {loading ? 'Menyimpan...' : isPemasukan ? 'Simpan Pemasukan' : 'Simpan Pengeluaran'}
+            </button>
             <button type="button" onClick={() => navigate('/laporan-keuangan')} className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
           </div>
         </form>
