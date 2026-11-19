@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { profilService } from '../../services/profilService'
+import { assetUrl } from '../../services/api'
 
 export default function Profil() {
   const [form, setForm] = useState({
@@ -31,7 +32,7 @@ export default function Profil() {
           email: data.email || '',
           mediaSosial: data.mediaSosial || '',
         }))
-        if (data.foto) setPreview(`${import.meta.env.VITE_API_URL?.replace('/api', '')}/storage/${data.foto}`)
+        if (data.foto) setPreview(assetUrl(data.foto))
       })
       .catch(() => setMessage({ type: 'error', text: 'Gagal memuat profil.' }))
       .finally(() => setLoading(false))

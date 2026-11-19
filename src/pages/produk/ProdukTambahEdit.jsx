@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { produkService } from '../../services/produkService'
+import { assetUrl } from '../../services/api'
 import api from '../../services/api'
 
 const FORM_DEFAULT = { idKategori: '', namaProduk: '', deskripsi: '', harga: '', tampil: 'Y', foto: null }
@@ -76,7 +77,7 @@ export default function ProdukForm({ productId = null, onClose = null, onSaved =
     produkService.getById(id)
       .then((data) => {
         setForm({ idKategori: String(data.idKategori), namaProduk: data.namaProduk, deskripsi: data.deskripsi, harga: String(data.harga), tampil: data.tampil ? 'Y' : 'N', foto: null })
-        if (data.foto) setPreview(`${import.meta.env.VITE_API_URL?.replace('/api', '')}/storage/${data.foto}`)
+        if (data.foto) setPreview(assetUrl(data.foto))
       })
       .catch(() => setError('Gagal memuat data produk.'))
       .finally(() => setFetching(false))

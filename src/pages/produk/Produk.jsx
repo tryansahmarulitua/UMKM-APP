@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import ProdukForm from './ProdukTambahEdit'
 import { produkService } from '../../services/produkService'
+import { assetUrl } from '../../services/api'
 
 const formatRupiah = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value)
 
@@ -65,7 +66,7 @@ export default function Produk() {
                       <td className="px-6 py-4">
                         {item.foto ? (
                           <img
-                            src={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8000'}/storage/${item.foto}`}
+                            src={assetUrl(item.foto)}
                             alt={item.namaProduk}
                             className="h-10 w-10 rounded-lg object-cover ring-1 ring-gray-200"
                           />
