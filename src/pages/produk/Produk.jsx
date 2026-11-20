@@ -40,7 +40,7 @@ export default function Produk() {
   return (
     <DashboardLayout>
       <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Kelola Produk</h1>
             <p className="mt-1 text-sm text-gray-500">Tambah, lihat, ubah, dan hapus produk UMKM.</p>
@@ -57,13 +57,13 @@ export default function Produk() {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  <tr><th className="w-12 px-6 py-3.5 text-center">#</th><th className="w-20 px-6 py-3.5">Gambar</th><th className="px-6 py-3.5">Produk</th><th className="px-6 py-3.5">Kategori</th><th className="px-6 py-3.5">Harga</th><th className="px-6 py-3.5">Status</th><th className="px-6 py-3.5 text-right">Aksi</th></tr>
+                  <tr><th className="w-12 px-4 py-3.5 text-center sm:px-6">#</th><th className="w-20 px-4 py-3.5 sm:px-6">Gambar</th><th className="px-4 py-3.5 sm:px-6">Produk</th><th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Kategori</th><th className="px-4 py-3.5 sm:px-6">Harga</th><th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Status</th><th className="px-4 py-3.5 text-right sm:px-6">Aksi</th></tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {produk.map((item, i) => (
                     <tr key={item.idProduk} className="transition hover:bg-indigo-50/40">
-                      <td className="px-6 py-4 text-center text-gray-400">{item.idProduk}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4 text-center text-gray-400 sm:px-6">{item.idProduk}</td>
+                      <td className="px-4 py-4 sm:px-6">
                         {item.foto ? (
                           <img
                             src={assetUrl(item.foto)}
@@ -74,11 +74,11 @@ export default function Produk() {
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">—</div>
                         )}
                       </td>
-                      <td className="px-6 py-4 font-medium text-gray-900">{item.namaProduk}</td>
-                      <td className="px-6 py-4 text-gray-600">{item.kategori?.namaKategori || '-'}</td>
-                      <td className="px-6 py-4 text-gray-600">{formatRupiah(item.harga)}</td>
-                      <td className="px-6 py-4"><span className={`rounded-full px-2 py-1 text-xs font-medium ${item.tampil ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{item.tampil ? 'Tampil' : 'Disembunyikan'}</span></td>
-                      <td className="px-6 py-4 text-right"><button onClick={() => setModal({ id: item.idProduk })} className="mr-3 font-medium text-indigo-600 hover:text-indigo-800">Edit</button><button onClick={() => handleDelete(item.idProduk)} className="font-medium text-red-600 hover:text-red-800">Hapus</button></td>
+                      <td className="px-4 py-4 font-medium text-gray-900 sm:px-6">{item.namaProduk}</td>
+                      <td className="hidden px-4 py-4 text-gray-600 sm:table-cell sm:px-6">{item.kategori?.namaKategori || '-'}</td>
+                      <td className="whitespace-nowrap px-4 py-4 text-gray-600 sm:px-6">{formatRupiah(item.harga)}</td>
+                      <td className="hidden px-4 py-4 sm:table-cell sm:px-6"><span className={`rounded-full px-2 py-1 text-xs font-medium ${item.tampil ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{item.tampil ? 'Tampil' : 'Disembunyikan'}</span></td>
+                      <td className="whitespace-nowrap px-4 py-4 text-right sm:px-6"><button onClick={() => setModal({ id: item.idProduk })} className="mr-3 font-medium text-indigo-600 hover:text-indigo-800">Edit</button><button onClick={() => handleDelete(item.idProduk)} className="font-medium text-red-600 hover:text-red-800">Hapus</button></td>
                     </tr>
                   ))}
                 </tbody>

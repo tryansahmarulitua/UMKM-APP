@@ -8,12 +8,14 @@ const menuItems = [
   { label: 'Laporan Keuangan',path: '/laporan-keuangan', icon: '▤' },
 ]
 
-export default function Sidebar({ collapsed }) {
+export default function Sidebar({ collapsed, onClose }) {
   return (
-    <aside
-      className={`flex shrink-0 flex-col bg-slate-900 text-white transition-all duration-300
-        ${collapsed ? 'w-16' : 'w-64'}`}
-    >
+    <>
+      {!collapsed && <button type="button" onClick={onClose} aria-label="Tutup sidebar" className="fixed inset-0 z-30 bg-slate-900/50 sm:hidden" />}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col bg-slate-900 text-white transition-transform duration-300 sm:relative sm:z-auto sm:translate-x-0 sm:transition-[width]
+          ${collapsed ? '-translate-x-full sm:w-16' : 'translate-x-0 sm:w-64'}`}
+      >
       {/* Brand */}
       <div className={`border-b border-slate-700 py-5 ${collapsed ? 'px-3' : 'px-6'}`}>
         {collapsed ? (
@@ -32,6 +34,7 @@ export default function Sidebar({ collapsed }) {
           <NavLink
             key={item.path}
             to={item.path}
+            onClick={onClose}
             title={collapsed ? item.label : undefined}
             className={({ isActive }) =>
               `flex items-center rounded-lg py-3 text-sm font-medium transition
@@ -46,9 +49,10 @@ export default function Sidebar({ collapsed }) {
       </nav>
 
       {/* Footer */}
-      {!collapsed && (
-        <div className="border-t border-slate-700 px-6 py-4 text-xs text-slate-400">Admin UMKM</div>
-      )}
-    </aside>
+        {!collapsed && (
+          <div className="border-t border-slate-700 px-6 py-4 text-xs text-slate-400">Admin UMKM</div>
+        )}
+      </aside>
+    </>
   )
 }

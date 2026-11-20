@@ -68,11 +68,11 @@ export default function LaporanForm() {
           {/* Jenis Toggle */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Jenis Transaksi</label>
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+            <div className="flex overflow-hidden rounded-lg border border-gray-200">
               <button
                 type="button"
                 onClick={() => setForm(p => ({ ...p, jenis: 'Pemasukan' }))}
-                className={`flex-1 py-2 text-sm font-medium transition ${
+                className={`min-w-0 flex-1 px-2 py-2 text-xs font-medium transition sm:text-sm ${
                   isPemasukan ? 'bg-green-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
                 }`}
               >
@@ -81,7 +81,7 @@ export default function LaporanForm() {
               <button
                 type="button"
                 onClick={() => setForm(p => ({ ...p, jenis: 'Pengeluaran' }))}
-                className={`flex-1 py-2 text-sm font-medium transition ${
+                className={`min-w-0 flex-1 px-2 py-2 text-xs font-medium transition sm:text-sm ${
                   !isPemasukan ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
                 }`}
               >

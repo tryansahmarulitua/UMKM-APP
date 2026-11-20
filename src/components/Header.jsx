@@ -14,7 +14,7 @@ export default function Header({ onToggleSidebar }) {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between bg-white shadow px-6">
+    <header className="flex h-16 items-center justify-between bg-white px-3 shadow sm:px-6">
       <button
         onClick={onToggleSidebar}
         className="rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -24,8 +24,8 @@ export default function Header({ onToggleSidebar }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+      <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+        <span className="hidden max-w-40 truncate text-sm font-medium text-gray-700 sm:block">{user?.name}</span>
         <button
           onClick={handleLogout}
           disabled={loggingOut}
