@@ -5,7 +5,8 @@ import GuestRoute from './layouts/GuestRoute'
 import Login from './pages/auth/Login'
 import Dashboard from './pages/admin/Dashboard'
 import Produk from './pages/produk/Produk'
-import KategoriList from './pages/kategori/KategoriList'
+import DaftarLabel from './pages/label/DaftarLabel'
+import { KATEGORI, RASA } from './pages/label/jenisLabel'
 import Profil from './pages/profil/Profil'
 import LaporanList from './pages/laporan/LaporanList'
 import LaporanForm from './pages/laporan/LaporanForm'
@@ -21,7 +22,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/produk" element={<Produk />} />
-            <Route path="/kategori" element={<KategoriList />} />
+            <Route path="/kategori" element={<DaftarLabel key="kategori" jenis={KATEGORI} />} />
+            <Route path="/rasa" element={<DaftarLabel key="rasa" jenis={RASA} />} />
             <Route path="/profil" element={<Profil />} />
             <Route path="/laporan-keuangan" element={<LaporanList />} />
             <Route path="/laporan-keuangan/tambah" element={<LaporanForm />} />

@@ -4,6 +4,7 @@ const menuItems = [
   { label: 'Dashboard',       path: '/dashboard',        icon: '▦' },
   { label: 'Produk',          path: '/produk',           icon: '▣' },
   { label: 'Kategori Produk', path: '/kategori',         icon: '◈' },
+  { label: 'Label Rasa',      path: '/rasa',             icon: '◇' },
   { label: 'Profil UMKM',     path: '/profil',           icon: '◎' },
   { label: 'Laporan Keuangan',path: '/laporan-keuangan', icon: '▤' },
 ]

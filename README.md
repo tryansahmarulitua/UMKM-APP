@@ -9,8 +9,9 @@ Tidak ada halaman registrasi. Akun admin dibuat sekali lewat seeder di UMKM-API 
 | Halaman | Isi |
 | --- | --- |
 | Dashboard | Ringkasan jumlah produk, kategori, status profil, dan laporan keuangan, total saldo, serta riwayat login admin |
-| Produk | Tambah, edit, dan hapus produk beserta foto; atur apakah produk tampil di katalog |
+| Produk | Tambah, edit, dan hapus produk beserta foto dan label rasa; atur apakah produk tampil di katalog |
 | Kategori | Kelola kategori produk |
+| Label Rasa | Kelola label rasa (Manis, Asin, Gurih, Pedas, Renyah, dan label tambahan). Label dipilih di form produk, tampil di katalog, dan dipakai chatbot untuk rekomendasi |
 | Profil | Nama usaha, deskripsi, alamat, nomor WhatsApp, email, media sosial, dan foto. Data ini tampil di website publik dan dipakai chatbot |
 | Laporan Keuangan | Catat pemasukan dan pengeluaran, lengkap dengan total, saldo, dan grafik per tanggal |
 
@@ -51,7 +52,7 @@ Variabel `VITE_*` ikut masuk ke bundle JavaScript dan bisa dibaca siapa pun, jad
 
 ```
 src/
-  pages/             halaman per menu (admin/Dashboard, produk, kategori, profil, laporan, auth/Login)
+  pages/             halaman per menu (admin/Dashboard, produk, label untuk kategori dan rasa, profil, laporan, auth/Login)
   components/        Header, Sidebar, FullPageSpinner
   layouts/           DashboardLayout, ProtectedRoute (wajib login), GuestRoute (khusus belum login)
   contexts/          AuthContext: status login dan token
@@ -60,7 +61,7 @@ src/
 vercel.json          rewrite SPA untuk Vercel
 ```
 
-Form produk dan kategori dibuka sebagai modal dari halaman daftarnya. Pesan error validasi berasal dari API dan sudah berbahasa Indonesia.
+Form produk, kategori, dan label rasa dibuka sebagai modal dari halaman daftarnya. Halaman Kategori dan Label Rasa memakai komponen yang sama (`pages/label/`), dengan pengaturan masing-masing di `jenisLabel.js`. Pesan error validasi berasal dari API dan sudah berbahasa Indonesia.
 
 ## Deploy
 
