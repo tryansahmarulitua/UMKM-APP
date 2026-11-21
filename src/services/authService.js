@@ -1,8 +1,8 @@
 import api from './api'
 
 export const authService = {
-  async login(credentials) {
-    const { data } = await api.post('/auth/login', credentials)
+  async login(credentials, turnstile) {
+    const { data } = await api.post('/auth/login', { ...credentials, turnstile })
     return data
   },
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import TurnstileWidget from '../../components/security/TurnstileWidget'
 import { useAuth } from '../../contexts/AuthContext'
 import { pesanError } from '../../utils/pesanError'
 
@@ -9,6 +10,8 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [turnstile, setTurnstile] = useState(null)
+  const handleTurnstile = useCallback((token) => setTurnstile(token), [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -21,8 +24,14 @@ export default function Login() {
     setLoading(true)
     setError('')
 
+    if (!turnstile) {
+      setError('Selesaikan verifikasi keamanan terlebih dahulu.')
+      setLoading(false)
+      return
+    }
+
     try {
-      await login(formData)
+      await login(formData, turnstile)
       navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(pesanError(err, 'Login gagal. Periksa email dan password.'))
@@ -76,9 +85,11 @@ export default function Login() {
             />
           </div>
 
+          <TurnstileWidget onToken={handleTurnstile} />
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !turnstile}
             className="w-full rounded-md bg-indigo-600 py-2 font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
           >
             {loading ? 'Memproses...' : 'Masuk'}

@@ -30,8 +30,8 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
-  const login = useCallback(async (credentials) => {
-    const data = await authService.login(credentials)
+  const login = useCallback(async (credentials, turnstile) => {
+    const data = await authService.login(credentials, turnstile)
     saveSession(data.token, data.user)
     return data
   }, [])
