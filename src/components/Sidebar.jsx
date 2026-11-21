@@ -19,11 +19,11 @@ export default function Sidebar({ collapsed, onClose }) {
       {/* Brand */}
       <div className={`border-b border-slate-700 py-5 ${collapsed ? 'px-3' : 'px-6'}`}>
         {collapsed ? (
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold">U</span>
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold">B</span>
         ) : (
           <>
             <p className="text-xs font-semibold uppercase tracking-widest text-indigo-300">Admin Panel</p>
-            <p className="mt-1 text-lg font-bold">UMKM Jatisampurna</p>
+            <p className="mt-1 text-lg font-bold">Bunda Riris</p>
           </>
         )}
       </div>

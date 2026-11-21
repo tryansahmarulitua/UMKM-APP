@@ -7,18 +7,7 @@ export function AuthProvider({ children }) {
   const [user, setUser]       = useState(() => {
     try { return JSON.parse(localStorage.getItem('auth_user')) } catch { return null }
   })
-  const [loading, setLoading] = useState(true)
-
-  // Verify token on mount
-  useEffect(() => {
-    const token = localStorage.getItem('auth_token')
-    if (!token) { setLoading(false); return }
-
-    authService.me()
-      .then(({ user }) => setUser(user))
-      .catch(() => clearSession())
-      .finally(() => setLoading(false))
-  }, [])
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem('auth_token')))
 
   const saveSession = (token, userData) => {
     localStorage.setItem('auth_token', token)
@@ -32,14 +21,17 @@ export function AuthProvider({ children }) {
     setUser(null)
   }
 
-  const login = useCallback(async (credentials) => {
-    const data = await authService.login(credentials)
-    saveSession(data.token, data.user)
-    return data
+  useEffect(() => {
+    if (!localStorage.getItem('auth_token')) return
+
+    authService.me()
+      .then(({ user }) => setUser(user))
+      .catch(() => clearSession())
+      .finally(() => setLoading(false))
   }, [])
 
-  const register = useCallback(async (payload) => {
-    const data = await authService.register(payload)
+  const login = useCallback(async (credentials) => {
+    const data = await authService.login(credentials)
     saveSession(data.token, data.user)
     return data
   }, [])
@@ -50,7 +42,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

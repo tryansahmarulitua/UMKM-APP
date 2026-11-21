@@ -10,12 +10,11 @@ export default function LaporanForm() {
 
   const [form, setForm] = useState({ jenis: 'Pemasukan', namaSumber: '', jumlah: '', tanggal: '', keterangan: '' })
   const [loading, setLoading] = useState(false)
-  const [fetching, setFetching] = useState(false)
+  const [fetching, setFetching] = useState(isEdit)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!isEdit) return
-    setFetching(true)
     laporanService.getById(id)
       .then((data) => setForm({
         jenis: data.jenis || 'Pemasukan',

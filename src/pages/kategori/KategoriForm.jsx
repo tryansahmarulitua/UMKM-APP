@@ -12,12 +12,11 @@ export default function KategoriForm({ categoryId = null, onClose = null, onSave
 
   const [form, setForm] = useState({ namaKategori: '' })
   const [loading, setLoading] = useState(false)
-  const [fetching, setFetching] = useState(false)
+  const [fetching, setFetching] = useState(isEdit)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!isEdit) return
-    setFetching(true)
     kategoriService.getAll()
       .then((data) => {
         const kat = data.find(k => k.idKategori === parseInt(id))

@@ -5,9 +5,7 @@ import { produkService } from '../../services/produkService'
 import { assetUrl } from '../../services/api'
 import api from '../../services/api'
 
-const FORM_DEFAULT = { idKategori: '', namaProduk: '', deskripsi: '', harga: '', tampil: 'Y', foto: null }
-
-const FormContent = ({ kategoris, form, preview, loading, fetching, error, handleChange, handleFile, handleSubmit, isEdit, onCancel }) => {
+const FormContent = ({ kategoris, form, preview, loading, fetching, error, handleChange, handleFile, handleSubmit, onCancel }) => {
   if (fetching) return <p className="p-6 text-sm text-gray-400">Memuat data...</p>
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -62,18 +60,15 @@ export default function ProdukForm({ productId = null, onClose = null, onSaved =
   const [form, setForm] = useState({ idKategori: '', namaProduk: '', deskripsi: '', harga: '', tampil: 'Y', foto: null })
   const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [fetching, setFetching] = useState(false)
+  const [fetching, setFetching] = useState(isEdit)
   const [error, setError] = useState('')
 
-  // Load kategori list
   useEffect(() => {
     api.get('/kategori').then(({ data }) => setKategoris(data)).catch(() => {})
   }, [])
 
-  // Load existing produk when editing
   useEffect(() => {
     if (!isEdit) return
-    setFetching(true)
     produkService.getById(id)
       .then((data) => {
         setForm({ idKategori: String(data.idKategori), namaProduk: data.namaProduk, deskripsi: data.deskripsi, harga: String(data.harga), tampil: data.tampil ? 'Y' : 'N', foto: null })
@@ -121,7 +116,7 @@ export default function ProdukForm({ productId = null, onClose = null, onSaved =
     }
   }
 
-  const content = <FormContent kategoris={kategoris} form={form} preview={preview} loading={loading} fetching={fetching} error={error} handleChange={handleChange} handleFile={handleFile} handleSubmit={handleSubmit} isEdit={isEdit} onCancel={() => (isModal ? onClose() : navigate('/produk'))} />
+  const content = <FormContent kategoris={kategoris} form={form} preview={preview} loading={loading} fetching={fetching} error={error} handleChange={handleChange} handleFile={handleFile} handleSubmit={handleSubmit} onCancel={() => (isModal ? onClose() : navigate('/produk'))} />
 
   if (isModal) return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">

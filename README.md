@@ -1,6 +1,8 @@
-# UMKM Jatisampurna
+# UMKM-APP — Dashboard Admin Bunda Riris
 
-Aplikasi web UMKM Jatisampurna terdiri dari dua bagian: **UMKM-API** (backend Laravel) dan **UMKM-APP** (frontend React + Vite).
+Dashboard admin website Menu Sedap ala Bunda Riris (React + Vite + Tailwind). Datanya diambil dari **UMKM-API** (backend Laravel); website publiknya ada di **UMKM-LandingPages**.
+
+Tidak ada halaman registrasi. Akun admin dibuat sekali lewat seeder di UMKM-API (`ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env` backend).
 
 ---
 
@@ -25,8 +27,12 @@ Buka terminal baru, masuk ke folder `UMKM-APP`, lalu jalankan:
 
 ```bash
 cd UMKM-APP
+npm install
+cp .env.example .env
 npm run dev
 ```
+
+Sebelum push, jalankan `npm run lint` dan `npm run build`.
 
 Frontend akan berjalan di `http://localhost:5173`.
 

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
-
-const rupiah = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value)
+import { formatRupiah as rupiah } from '../../utils/formatRupiah'
+import { saldo, totalJenis } from '../../utils/keuangan'
 const formatTanggal = (value) => value ? String(value).slice(0, 10) : '-'
 const chartDate = (value) => value ? String(value).slice(5, 10) : '-'
 
@@ -14,25 +14,22 @@ export default function LaporanList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const load = async () => {
-    try { setItems(await laporanService.getAll()) } catch (err) { setError(err.response?.data?.message || 'Gagal memuat laporan.') } finally { setLoading(false) }
-  }
-
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    laporanService.getAll()
+      .then(setItems)
+      .catch((err) => setError(err.response?.data?.message || 'Gagal memuat laporan.'))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleDelete = async (id) => {
     if (!window.confirm('Hapus catatan keuangan ini?')) return
     try { await laporanService.destroy(id); setItems((prev) => prev.filter((item) => item.idLK !== id)) } catch (err) { setError(err.response?.data?.message || 'Gagal menghapus laporan.') }
   }
 
-  const total = items.reduce((saldo, item) => (
-    saldo + (item.jenis === 'Pemasukan' ? Number(item.jumlah) : -Number(item.jumlah))
-  ), 0)
+  const total = saldo(items)
+  const totalPemasukan = totalJenis(items, 'Pemasukan')
+  const totalPengeluaran = totalJenis(items, 'Pengeluaran')
 
-  const totalPemasukan = items.filter(i => i.jenis === 'Pemasukan').reduce((s, i) => s + Number(i.jumlah), 0)
-  const totalPengeluaran = items.filter(i => i.jenis === 'Pengeluaran').reduce((s, i) => s + Number(i.jumlah), 0)
-
-  // group by tanggal untuk bar chart
   const chartData = Object.values(
     items.reduce((acc, item) => {
       const tgl = chartDate(item.tanggal)
