@@ -5,6 +5,7 @@ import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
 import { formatRupiah as rupiah } from '../../utils/formatRupiah'
 import { grafikPerTanggal, rupiahSingkat, saldo, totalJenis } from '../../utils/keuangan'
+import { pesanError } from '../../utils/pesanError'
 const formatTanggal = (value) => value ? String(value).slice(0, 10) : '-'
 
 export default function LaporanList() {
@@ -16,13 +17,18 @@ export default function LaporanList() {
   useEffect(() => {
     laporanService.getAll()
       .then(setItems)
-      .catch((err) => setError(err.response?.data?.message || 'Gagal memuat laporan.'))
+      .catch((err) => setError(pesanError(err, 'Gagal memuat laporan.')))
       .finally(() => setLoading(false))
   }, [])
 
   const handleDelete = async (id) => {
     if (!window.confirm('Hapus catatan keuangan ini?')) return
-    try { await laporanService.destroy(id); setItems((prev) => prev.filter((item) => item.idLK !== id)) } catch (err) { setError(err.response?.data?.message || 'Gagal menghapus laporan.') }
+    try {
+      await laporanService.destroy(id)
+      setItems((prev) => prev.filter((item) => item.idLK !== id))
+    } catch (err) {
+      setError(pesanError(err, 'Gagal menghapus laporan.'))
+    }
   }
 
   const total = saldo(items)
@@ -61,7 +67,37 @@ export default function LaporanList() {
         </section>}
         <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
           {loading ? <div className="p-10 text-center text-sm text-gray-400">Memuat data...</div> : items.length === 0 ? <div className="p-10 text-center text-sm text-gray-400">Belum ada catatan keuangan.</div> : (
-            <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500"><tr><th className="px-4 py-3.5 sm:px-6">Jenis</th><th className="px-4 py-3.5 sm:px-6">Sumber</th><th className="px-4 py-3.5 sm:px-6">Jumlah</th><th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Tanggal</th><th className="hidden px-4 py-3.5 md:table-cell md:px-6">Keterangan</th><th className="px-4 py-3.5 text-right sm:px-6">Aksi</th></tr></thead><tbody className="divide-y divide-gray-100">{items.map((item) => <tr key={item.idLK} className="transition hover:bg-indigo-50/40"><td className="whitespace-nowrap px-4 py-4 sm:px-6"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${item.jenis === 'Pemasukan' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.jenis}</span></td><td className="px-4 py-4 font-medium text-gray-900 sm:px-6">{item.namaSumber}</td><td className="whitespace-nowrap px-4 py-4 text-gray-700 sm:px-6">{rupiah(item.jumlah)}</td><td className="hidden whitespace-nowrap px-4 py-4 text-gray-600 sm:table-cell sm:px-6">{formatTanggal(item.tanggal)}</td><td className="hidden px-4 py-4 text-gray-600 md:table-cell md:px-6">{item.keterangan || '-'}</td><td className="whitespace-nowrap px-4 py-4 text-right sm:px-6"><button onClick={() => navigate(`/laporan-keuangan/${item.idLK}/edit`)} className="mr-2 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-100">Edit</button><button onClick={() => handleDelete(item.idLK)} className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100">Hapus</button></td></tr>)}</tbody></table></div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th className="px-4 py-3.5 sm:px-6">Jenis</th>
+                    <th className="px-4 py-3.5 sm:px-6">Sumber</th>
+                    <th className="px-4 py-3.5 sm:px-6">Jumlah</th>
+                    <th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Tanggal</th>
+                    <th className="hidden px-4 py-3.5 md:table-cell md:px-6">Keterangan</th>
+                    <th className="px-4 py-3.5 text-right sm:px-6">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {items.map((item) => (
+                    <tr key={item.idLK} className="transition hover:bg-indigo-50/40">
+                      <td className="whitespace-nowrap px-4 py-4 sm:px-6">
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${item.jenis === 'Pemasukan' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.jenis}</span>
+                      </td>
+                      <td className="px-4 py-4 font-medium text-gray-900 sm:px-6">{item.namaSumber}</td>
+                      <td className="whitespace-nowrap px-4 py-4 text-gray-700 sm:px-6">{rupiah(item.jumlah)}</td>
+                      <td className="hidden whitespace-nowrap px-4 py-4 text-gray-600 sm:table-cell sm:px-6">{formatTanggal(item.tanggal)}</td>
+                      <td className="hidden px-4 py-4 text-gray-600 md:table-cell md:px-6">{item.keterangan || '-'}</td>
+                      <td className="whitespace-nowrap px-4 py-4 text-right sm:px-6">
+                        <button type="button" onClick={() => navigate(`/laporan-keuangan/${item.idLK}/edit`)} className="mr-2 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-100">Edit</button>
+                        <button type="button" onClick={() => handleDelete(item.idLK)} className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100">Hapus</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>

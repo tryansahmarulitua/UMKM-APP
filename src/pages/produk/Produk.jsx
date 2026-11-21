@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
-import ProdukForm from './ProdukTambahEdit'
+import ProdukForm from './ProdukForm'
 import { produkService } from '../../services/produkService'
 import { assetUrl } from '../../services/api'
 import { formatRupiah } from '../../utils/formatRupiah'
+import { pesanError } from '../../utils/pesanError'
 
 export default function Produk() {
   const [produk, setProduk] = useState([])
@@ -16,7 +17,7 @@ export default function Produk() {
       setProduk(data)
       setError('')
     })
-    .catch((err) => setError(err.response?.data?.message || 'Gagal memuat produk.'))
+    .catch((err) => setError(pesanError(err, 'Gagal memuat produk.')))
     .finally(() => setLoading(false))
 
   useEffect(() => { loadProduk() }, [])
@@ -27,7 +28,7 @@ export default function Produk() {
       await produkService.delete(id)
       setProduk((items) => items.filter((item) => item.idProduk !== id))
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal menghapus produk.')
+      setError(pesanError(err, 'Gagal menghapus produk.'))
     }
   }
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import KategoriForm from './KategoriForm'
 import { kategoriService } from '../../services/kategoriService'
+import { pesanError } from '../../utils/pesanError'
 
 export default function KategoriList() {
   const [kategoris, setKategoris] = useState([])
@@ -14,7 +15,7 @@ export default function KategoriList() {
       setKategoris(data)
       setError('')
     })
-    .catch((err) => setError(err.response?.data?.message || 'Gagal memuat kategori.'))
+    .catch((err) => setError(pesanError(err, 'Gagal memuat kategori.')))
     .finally(() => setLoading(false))
 
   useEffect(() => { loadKategori() }, [])
@@ -25,7 +26,7 @@ export default function KategoriList() {
       await kategoriService.destroy(id)
       setKategoris((items) => items.filter(item => item.idKategori !== id))
     } catch (err) {
-      setError(err.response?.data?.message || 'Gagal menghapus kategori.')
+      setError(pesanError(err, 'Gagal menghapus kategori.'))
     }
   }
 
