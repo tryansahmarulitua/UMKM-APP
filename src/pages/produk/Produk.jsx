@@ -69,7 +69,10 @@ export default function Produk() {
                           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-xs text-gray-400">—</div>
                         )}
                       </td>
-                      <td className="px-4 py-4 font-medium text-gray-900 sm:px-6">{item.namaProduk}</td>
+                      <td className="px-4 py-4 sm:px-6">
+                        <p className="font-medium text-gray-900">{item.namaProduk}</p>
+                        {item.rasa?.length > 0 && <p className="mt-1 flex flex-wrap gap-1">{item.rasa.map((r) => <span key={r.idRasa} className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-700">{r.namaRasa}</span>)}</p>}
+                      </td>
                       <td className="hidden px-4 py-4 text-gray-600 sm:table-cell sm:px-6">{item.kategori?.namaKategori || '-'}</td>
                       <td className="whitespace-nowrap px-4 py-4 text-gray-600 sm:px-6">{formatRupiah(item.harga)}</td>
                       <td className="hidden px-4 py-4 sm:table-cell sm:px-6"><span className={`rounded-full px-2 py-1 text-xs font-medium ${item.tampil ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{item.tampil ? 'Tampil' : 'Disembunyikan'}</span></td>
