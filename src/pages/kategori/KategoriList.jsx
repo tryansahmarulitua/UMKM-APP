@@ -1,28 +1,21 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import KategoriForm from './KategoriForm'
 import { kategoriService } from '../../services/kategoriService'
 
 export default function KategoriList() {
-  const navigate = useNavigate()
   const [kategoris, setKategoris] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [modal, setModal] = useState(null)
 
-  const loadKategori = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      const data = await kategoriService.getAll()
+  const loadKategori = () => kategoriService.getAll()
+    .then((data) => {
       setKategoris(data)
-    } catch (err) {
-      setError(err.response?.data?.message || 'Gagal memuat kategori.')
-    } finally {
-      setLoading(false)
-    }
-  }
+      setError('')
+    })
+    .catch((err) => setError(err.response?.data?.message || 'Gagal memuat kategori.'))
+    .finally(() => setLoading(false))
 
   useEffect(() => { loadKategori() }, [])
 

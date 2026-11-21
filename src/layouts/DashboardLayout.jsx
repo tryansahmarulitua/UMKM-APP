@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Header from '../components/Header'
 import Sidebar from '../components/Sidebar'
@@ -8,13 +8,15 @@ const isMobile = () => window.matchMedia('(max-width: 639px)').matches
 export default function DashboardLayout({ children }) {
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(isMobile)
-  const closeSidebarOnMobile = () => {
+  const [path, setPath] = useState(location.pathname)
+  if (path !== location.pathname) {
+    setPath(location.pathname)
     if (isMobile()) setCollapsed(true)
   }
 
-  useEffect(() => {
+  const closeSidebarOnMobile = () => {
     if (isMobile()) setCollapsed(true)
-  }, [location.pathname])
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">

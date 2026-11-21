@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import ProdukForm from './ProdukTambahEdit'
 import { produkService } from '../../services/produkService'
 import { assetUrl } from '../../services/api'
-
-const formatRupiah = (value) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value)
+import { formatRupiah } from '../../utils/formatRupiah'
 
 export default function Produk() {
-  const navigate = useNavigate()
   const [produk, setProduk] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [modal, setModal] = useState(null)
 
-  const loadProduk = async () => {
-    try {
-      setLoading(true)
-      setProduk(await produkService.getAll())
-    } catch (err) {
-      setError(err.response?.data?.message || 'Gagal memuat produk.')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const loadProduk = () => produkService.getAll()
+    .then((data) => {
+      setProduk(data)
+      setError('')
+    })
+    .catch((err) => setError(err.response?.data?.message || 'Gagal memuat produk.'))
+    .finally(() => setLoading(false))
 
   useEffect(() => { loadProduk() }, [])
 
@@ -60,7 +54,7 @@ export default function Produk() {
                   <tr><th className="w-12 px-4 py-3.5 text-center sm:px-6">#</th><th className="w-20 px-4 py-3.5 sm:px-6">Gambar</th><th className="px-4 py-3.5 sm:px-6">Produk</th><th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Kategori</th><th className="px-4 py-3.5 sm:px-6">Harga</th><th className="hidden px-4 py-3.5 sm:table-cell sm:px-6">Status</th><th className="px-4 py-3.5 text-right sm:px-6">Aksi</th></tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {produk.map((item, i) => (
+                  {produk.map((item) => (
                     <tr key={item.idProduk} className="transition hover:bg-indigo-50/40">
                       <td className="px-4 py-4 text-center text-gray-400 sm:px-6">{item.idProduk}</td>
                       <td className="px-4 py-4 sm:px-6">

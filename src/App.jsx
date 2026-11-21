@@ -3,7 +3,6 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './layouts/ProtectedRoute'
 import GuestRoute from './layouts/GuestRoute'
 import Login from './pages/auth/Login'
-import Register from './pages/auth/Register'
 import Dashboard from './pages/admin/Dashboard'
 import Produk from './pages/produk/Produk'
 import ProdukForm from './pages/produk/ProdukTambahEdit'
@@ -12,7 +11,6 @@ import KategoriForm from './pages/kategori/KategoriForm'
 import Profil from './pages/profil/Profil'
 import LaporanList from './pages/laporan/LaporanList'
 import LaporanForm from './pages/laporan/LaporanForm'
-import './App.css'
 
 function App() {
   return (
@@ -21,7 +19,6 @@ function App() {
         <Routes>
           <Route element={<GuestRoute />}>
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
           </Route>
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
