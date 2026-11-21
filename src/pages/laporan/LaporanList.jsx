@@ -4,9 +4,8 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
 import { formatRupiah as rupiah } from '../../utils/formatRupiah'
-import { saldo, totalJenis } from '../../utils/keuangan'
+import { grafikPerTanggal, rupiahSingkat, saldo, totalJenis } from '../../utils/keuangan'
 const formatTanggal = (value) => value ? String(value).slice(0, 10) : '-'
-const chartDate = (value) => value ? String(value).slice(5, 10) : '-'
 
 export default function LaporanList() {
   const navigate = useNavigate()
@@ -30,14 +29,7 @@ export default function LaporanList() {
   const totalPemasukan = totalJenis(items, 'Pemasukan')
   const totalPengeluaran = totalJenis(items, 'Pengeluaran')
 
-  const chartData = Object.values(
-    items.reduce((acc, item) => {
-      const tgl = chartDate(item.tanggal)
-      if (!acc[tgl]) acc[tgl] = { tanggal: tgl, Pemasukan: 0, Pengeluaran: 0 }
-      acc[tgl][item.jenis] = (acc[tgl][item.jenis] || 0) + Number(item.jumlah)
-      return acc
-    }, {})
-  ).sort((a, b) => a.tanggal.localeCompare(b.tanggal))
+  const chartData = grafikPerTanggal(items)
 
   return (
     <DashboardLayout>
@@ -58,7 +50,7 @@ export default function LaporanList() {
               <BarChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="tanggal" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `${value / 1000}k`} width={48} />
+                <YAxis tick={{ fontSize: 12 }} tickFormatter={rupiahSingkat} width={56} />
                 <Tooltip formatter={(value) => rupiah(value)} />
                 <Legend />
                 <Bar dataKey="Pemasukan" fill="#16a34a" radius={[4, 4, 0, 0]} />
