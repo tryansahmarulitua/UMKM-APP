@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
+import { JENIS } from '../../utils/keuangan'
 import { pesanError } from '../../utils/pesanError'
 
 export default function LaporanForm() {
@@ -34,7 +35,7 @@ export default function LaporanForm() {
     setError('')
   }
 
-  const isPemasukan = form.jenis === 'Pemasukan'
+  const jenis = JENIS[form.jenis] ?? JENIS.Pemasukan
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -58,7 +59,7 @@ export default function LaporanForm() {
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{isEdit ? 'Edit Catatan Keuangan' : 'Tambah Catatan Keuangan'}</h1>
-          <p className="mt-1 text-sm text-gray-500">{isEdit ? 'Perbarui catatan sumber modal/keuangan.' : 'Tambahkan catatan sumber modal atau keuangan baru.'}</p>
+          <p className="mt-1 text-sm text-gray-500">{isEdit ? 'Perbarui catatan keuangan.' : 'Catat modal, pemasukan, atau pengeluaran usaha.'}</p>
         </div>
 
         {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
@@ -68,44 +69,34 @@ export default function LaporanForm() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Jenis Transaksi</label>
             <div className="flex overflow-hidden rounded-lg border border-gray-200">
-              <button
-                type="button"
-                onClick={() => setForm(p => ({ ...p, jenis: 'Pemasukan' }))}
-                className={`min-w-0 flex-1 px-2 py-2 text-xs font-medium transition sm:text-sm ${
-                  isPemasukan ? 'bg-green-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                ↑ Pemasukan Modal
-              </button>
-              <button
-                type="button"
-                onClick={() => setForm(p => ({ ...p, jenis: 'Pengeluaran' }))}
-                className={`min-w-0 flex-1 px-2 py-2 text-xs font-medium transition sm:text-sm ${
-                  !isPemasukan ? 'bg-red-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                ↓ Pengeluaran
-              </button>
+              {Object.entries(JENIS).map(([nama, gaya]) => (
+                <button
+                  key={nama}
+                  type="button"
+                  onClick={() => setForm((p) => ({ ...p, jenis: nama }))}
+                  aria-pressed={form.jenis === nama}
+                  className={`min-w-0 flex-1 px-2 py-2 text-xs font-medium transition sm:text-sm ${
+                    form.jenis === nama ? gaya.aktif : 'bg-white text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {gaya.tombol}
+                </button>
+              ))}
             </div>
+            {form.jenis === 'Modal' && <p className="mt-2 text-xs text-gray-500">Modal adalah uang pemilik yang dimasukkan ke usaha. Modal menambah saldo, tapi tidak dihitung sebagai laba.</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              {isPemasukan ? 'Sumber Modal / Pemasukan' : 'Keperluan / Tujuan Pengeluaran'}
-            </label>
+            <label className="block text-sm font-medium text-gray-700">{jenis.labelSumber}</label>
             <input type="text" name="namaSumber" value={form.namaSumber} onChange={handleChange} required maxLength={100}
-              placeholder={isPemasukan ? 'Contoh: Modal Sendiri, Pinjaman Bank, Hibah...' : 'Contoh: Pembelian Bahan Baku, Biaya Operasional...'}
+              placeholder={jenis.contoh}
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Jumlah (Rp)</label>
             <input type="number" name="jumlah" value={form.jumlah} onChange={handleChange} required min="0" placeholder="0"
-              className={`mt-1 w-full rounded-md border px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${
-                isPemasukan
-                  ? 'border-green-300 focus:border-green-500 focus:ring-green-500'
-                  : 'border-red-300 focus:border-red-400 focus:ring-red-400'
-              }`} />
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-gray-900 focus:outline-none focus:ring-1 ${jenis.input}`} />
           </div>
 
           <div>
@@ -115,15 +106,13 @@ export default function LaporanForm() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Keterangan <span className="text-gray-400">(opsional)</span></label>
-            <textarea name="keterangan" value={form.keterangan} onChange={handleChange} rows={3} maxLength={255} placeholder="Catatan tambahan..." className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+            <textarea name="keterangan" value={form.keterangan} onChange={handleChange} rows={3} maxLength={100} placeholder="Catatan tambahan..." className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
           </div>
 
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={loading}
-              className={`rounded-lg px-6 py-2 text-sm font-medium text-white disabled:opacity-50 ${
-                isPemasukan ? 'bg-green-600 hover:bg-green-700' : 'bg-red-500 hover:bg-red-600'
-              }`}>
-              {loading ? 'Menyimpan...' : isPemasukan ? 'Simpan Pemasukan' : 'Simpan Pengeluaran'}
+              className={`rounded-lg px-6 py-2 text-sm font-medium text-white disabled:opacity-50 ${jenis.simpan}`}>
+              {loading ? 'Menyimpan...' : `Simpan ${form.jenis}`}
             </button>
             <button type="button" onClick={() => navigate('/laporan-keuangan')} className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>
           </div>

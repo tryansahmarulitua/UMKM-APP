@@ -4,7 +4,8 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
 import { formatRupiah as rupiah } from '../../utils/formatRupiah'
-import { grafikPerTanggal, rupiahSingkat, saldo, totalJenis } from '../../utils/keuangan'
+import { grafikPerTanggal, JENIS, rupiahSingkat, saldo, totalJenis } from '../../utils/keuangan'
+import RingkasanKeuangan from './RingkasanKeuangan'
 import { pesanError } from '../../utils/pesanError'
 const formatTanggal = (value) => value ? String(value).slice(0, 10) : '-'
 
@@ -32,6 +33,7 @@ export default function LaporanList() {
   }
 
   const total = saldo(items)
+  const totalModal = totalJenis(items, 'Modal')
   const totalPemasukan = totalJenis(items, 'Pemasukan')
   const totalPengeluaran = totalJenis(items, 'Pengeluaran')
 
@@ -41,15 +43,16 @@ export default function LaporanList() {
     <DashboardLayout>
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div><h1 className="text-2xl font-bold text-gray-900">Laporan Keuangan</h1><p className="mt-1 text-sm text-gray-500">Catatan sumber modal dan keuangan usaha.</p></div>
+          <div><h1 className="text-2xl font-bold text-gray-900">Laporan Keuangan</h1><p className="mt-1 text-sm text-gray-500">Catatan modal, pemasukan, dan pengeluaran usaha.</p></div>
           <button onClick={() => navigate('/laporan-keuangan/tambah')} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">+ Tambah Catatan</button>
         </div>
         <div className="rounded-xl bg-indigo-600 p-5 text-white shadow-sm"><p className="text-sm text-indigo-100">Total Saldo</p><p className="mt-1 text-2xl font-bold">{rupiah(total)}</p></div>
         {error && <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+        {!loading && <RingkasanKeuangan versi={items} />}
         {!loading && items.length > 0 && <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div><h2 className="text-lg font-semibold text-gray-900">Analisis Keuangan</h2><p className="mt-1 text-sm text-gray-500">Perbandingan pemasukan dan pengeluaran berdasarkan tanggal.</p></div>
-            <div className="flex gap-4 text-sm"><span className="text-green-600">Masuk: <strong>{rupiah(totalPemasukan)}</strong></span><span className="text-red-600">Keluar: <strong>{rupiah(totalPengeluaran)}</strong></span></div>
+            <div><h2 className="text-lg font-semibold text-gray-900">Analisis Keuangan</h2><p className="mt-1 text-sm text-gray-500">Perbandingan modal, pemasukan, dan pengeluaran berdasarkan tanggal.</p></div>
+            <div className="flex flex-wrap gap-4 text-sm"><span className="text-indigo-600">Modal: <strong>{rupiah(totalModal)}</strong></span><span className="text-green-600">Masuk: <strong>{rupiah(totalPemasukan)}</strong></span><span className="text-red-600">Keluar: <strong>{rupiah(totalPengeluaran)}</strong></span></div>
           </div>
           <div className="mt-6 h-72 w-full sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -59,8 +62,7 @@ export default function LaporanList() {
                 <YAxis tick={{ fontSize: 12 }} tickFormatter={rupiahSingkat} width={56} />
                 <Tooltip formatter={(value) => rupiah(value)} />
                 <Legend />
-                <Bar dataKey="Pemasukan" fill="#16a34a" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="Pengeluaran" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                {['Modal', 'Pemasukan', 'Pengeluaran'].map((jenis) => <Bar key={jenis} dataKey={jenis} fill={JENIS[jenis].grafik} radius={[4, 4, 0, 0]} />)}
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -83,7 +85,7 @@ export default function LaporanList() {
                   {items.map((item) => (
                     <tr key={item.idLK} className="transition hover:bg-indigo-50/40">
                       <td className="whitespace-nowrap px-4 py-4 sm:px-6">
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${item.jenis === 'Pemasukan' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{item.jenis}</span>
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${JENIS[item.jenis]?.badge ?? 'bg-gray-100 text-gray-700'}`}>{item.jenis}</span>
                       </td>
                       <td className="px-4 py-4 font-medium text-gray-900 sm:px-6">{item.namaSumber}</td>
                       <td className="whitespace-nowrap px-4 py-4 text-gray-700 sm:px-6">{rupiah(item.jumlah)}</td>
