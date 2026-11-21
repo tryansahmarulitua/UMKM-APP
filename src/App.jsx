@@ -10,6 +10,8 @@ import { KATEGORI, RASA } from './pages/label/jenisLabel'
 import Profil from './pages/profil/Profil'
 import LaporanList from './pages/laporan/LaporanList'
 import LaporanForm from './pages/laporan/LaporanForm'
+import PesananList from './pages/pesanan/PesananList'
+import Pengaturan from './pages/pengaturan/Pengaturan'
 
 function App() {
   return (
@@ -28,6 +30,8 @@ function App() {
             <Route path="/laporan-keuangan" element={<LaporanList />} />
             <Route path="/laporan-keuangan/tambah" element={<LaporanForm />} />
             <Route path="/laporan-keuangan/:id/edit" element={<LaporanForm />} />
+            <Route path="/pesanan" element={<PesananList />} />
+            <Route path="/pengaturan" element={<Pengaturan />} />
           </Route>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

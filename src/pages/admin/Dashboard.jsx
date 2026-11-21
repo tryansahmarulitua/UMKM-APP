@@ -3,10 +3,12 @@ import DashboardLayout from '../../layouts/DashboardLayout'
 import { useAuth } from '../../contexts/AuthContext'
 import api from '../../services/api'
 import { profilService } from '../../services/profilService'
+import { pesananService } from '../../services/pesananService'
 import { formatRupiah } from '../../utils/formatRupiah'
 import { saldo } from '../../utils/keuangan'
 
 const summaries = [
+  { key: 'menunggu', label: 'Menunggu Pembayaran', icon: '▧', color: 'bg-amber-500' },
   { key: 'produk', label: 'Total Produk', icon: '▣', color: 'bg-blue-500' },
   { key: 'kategori', label: 'Kategori Produk', icon: '◈', color: 'bg-emerald-500' },
   { key: 'profil', label: 'Profil UMKM', icon: '◎', color: 'bg-violet-500' },
@@ -16,24 +18,26 @@ const summaries = [
 export default function Dashboard() {
   const { user } = useAuth()
   const [sessions, setSessions] = useState([])
-  const [stats, setStats] = useState({ produk: 0, kategori: 0, profil: '-', laporan: 0, saldo: 0 })
+  const [stats, setStats] = useState({ menunggu: 0, produk: 0, kategori: 0, profil: '-', laporan: 0, saldo: 0 })
   const [error, setError] = useState('')
 
   useEffect(() => {
     api.get('/auth/login-history').then(({ data }) => setSessions(data)).catch(() => {})
+    pesananService.getAll('Menunggu Pembayaran').then((data) => setStats((prev) => ({ ...prev, menunggu: data.length }))).catch(() => {})
     Promise.all([
       api.get('/produk'),
       api.get('/kategori'),
       api.get('/laporan-keuangan'),
       profilService.get(),
     ]).then(([produkRes, kategoriRes, laporanRes, profil]) => {
-      setStats({
+      setStats((prev) => ({
+        ...prev,
         produk: produkRes.data.length,
         kategori: kategoriRes.data.length,
         profil: profil ? 'Lengkap' : 'Belum diisi',
         laporan: laporanRes.data.length,
         saldo: saldo(laporanRes.data),
-      })
+      }))
     }).catch(() => setError('Ringkasan belum bisa dimuat. Coba muat ulang halaman.'))
   }, [])
 
@@ -47,7 +51,7 @@ export default function Dashboard() {
 
         {error && <p className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {summaries.map((item) => (
             <article
               key={item.label}
@@ -89,7 +93,7 @@ export default function Dashboard() {
           <article className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Selamat Datang</h2>
             <p className="mt-3 text-sm leading-6 text-gray-600">
-              Halo, <strong>{user?.name}</strong>. Kelola data produk, profil UMKM, kategori, dan laporan keuangan melalui menu navigasi di sidebar.
+              Halo, <strong>{user?.name}</strong>. Kelola pesanan, produk, profil UMKM, kategori, dan laporan keuangan melalui menu navigasi di sidebar.
             </p>
             <div className="mt-5 rounded-lg bg-indigo-50 p-4 text-sm text-indigo-700">
               Gunakan sidebar untuk mulai mengelola data UMKM Anda.

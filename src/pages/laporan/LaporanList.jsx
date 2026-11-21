@@ -92,8 +92,12 @@ export default function LaporanList() {
                       <td className="hidden whitespace-nowrap px-4 py-4 text-gray-600 sm:table-cell sm:px-6">{formatTanggal(item.tanggal)}</td>
                       <td className="hidden px-4 py-4 text-gray-600 md:table-cell md:px-6">{item.keterangan || '-'}</td>
                       <td className="whitespace-nowrap px-4 py-4 text-right sm:px-6">
+                        {item.idPesanan ? (
+                          <span className="text-xs text-gray-400" title="Dicatat otomatis saat pesanan ditandai Lunas, jadi tidak bisa diubah atau dihapus.">Otomatis dari pesanan</span>
+                        ) : (<>
                         <button type="button" onClick={() => navigate(`/laporan-keuangan/${item.idLK}/edit`)} className="mr-2 inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-100">Edit</button>
                         <button type="button" onClick={() => handleDelete(item.idLK)} className="inline-flex items-center rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-100">Hapus</button>
+                        </>)}
                       </td>
                     </tr>
                   ))}

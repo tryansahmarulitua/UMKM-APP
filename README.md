@@ -8,12 +8,14 @@ Tidak ada halaman registrasi. Akun admin dibuat sekali lewat seeder di UMKM-API 
 
 | Halaman | Isi |
 | --- | --- |
-| Dashboard | Ringkasan jumlah produk, kategori, status profil, dan laporan keuangan, total saldo, serta riwayat login admin |
+| Dashboard | Ringkasan pesanan yang menunggu pembayaran, jumlah produk, kategori, status profil, dan laporan keuangan, total saldo, serta riwayat login admin |
+| Pesanan | Daftar pesanan dengan filter status, detail (produk, total, WhatsApp pelanggan, tanggal lunas), dan tombol status yang sah saja: Tandai Lunas, Batalkan, Tandai Selesai. Pesanan Lunas otomatis menjadi pemasukan |
 | Produk | Tambah, edit, dan hapus produk beserta foto dan label rasa; atur apakah produk tampil di katalog |
 | Kategori | Kelola kategori produk |
 | Label Rasa | Kelola label rasa (Manis, Asin, Gurih, Pedas, Renyah, dan label tambahan). Label dipilih di form produk, tampil di katalog, dan dipakai chatbot untuk rekomendasi |
 | Profil | Nama usaha, deskripsi, alamat, nomor WhatsApp, email, media sosial, dan foto. Data ini tampil di website publik dan dipakai chatbot |
-| Laporan Keuangan | Catat modal, pemasukan, dan pengeluaran, lengkap dengan saldo, grafik per tanggal, dan ringkasan harian, mingguan, atau bulanan (modal, pemasukan, pengeluaran, laba, saldo akhir). Modal menambah saldo tapi tidak dihitung sebagai laba |
+| Pengaturan | Rekening tujuan transfer dan nomor WhatsApp pemesanan yang tampil ke pembeli setelah checkout |
+| Laporan Keuangan | Catat modal, pemasukan, dan pengeluaran, lengkap dengan saldo, grafik per tanggal, dan ringkasan harian, mingguan, atau bulanan (modal, pemasukan, pengeluaran, laba, saldo akhir). Modal menambah saldo tapi tidak dihitung sebagai laba. Pemasukan dari pesanan ditandai "Otomatis dari pesanan" dan tidak bisa diubah atau dihapus |
 
 Foto yang diunggah otomatis diperkecil oleh API (maks. 5 MB per foto), jadi foto langsung dari kamera HP bisa dipakai.
 

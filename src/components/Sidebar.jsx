@@ -2,11 +2,13 @@ import { NavLink } from 'react-router-dom'
 
 const menuItems = [
   { label: 'Dashboard',       path: '/dashboard',        icon: '▦' },
+  { label: 'Pesanan',         path: '/pesanan',          icon: '▧' },
   { label: 'Produk',          path: '/produk',           icon: '▣' },
   { label: 'Kategori Produk', path: '/kategori',         icon: '◈' },
   { label: 'Label Rasa',      path: '/rasa',             icon: '◇' },
   { label: 'Profil UMKM',     path: '/profil',           icon: '◎' },
   { label: 'Laporan Keuangan',path: '/laporan-keuangan', icon: '▤' },
+  { label: 'Pengaturan',      path: '/pengaturan',       icon: '⚙' },
 ]
 
 export default function Sidebar({ collapsed, onClose }) {
