@@ -3,16 +3,13 @@ import DashboardLayout from '../../layouts/DashboardLayout'
 import { profilService } from '../../services/profilService'
 import { assetUrl } from '../../services/api'
 
+const EMPTY_PROFIL = { namaUMKM: '', deskripsi: '', alamat: '', noTelepon: '', email: '', mediaSosial: '' }
+
 export default function Profil() {
-  const [form, setForm] = useState({
-    namaUMKM: '',
-    deskripsi: '',
-    alamat: '',
-    noTelepon: '',
-    email: '',
-    mediaSosial: '',
-    foto: null,
-  })
+  // `saved` is what the page shows; `form` is the modal's draft, so Batal really discards edits.
+  const [saved, setSaved] = useState(EMPTY_PROFIL)
+  const [savedPreview, setSavedPreview] = useState(null)
+  const [form, setForm] = useState({ ...EMPTY_PROFIL, foto: null })
   const [preview, setPreview] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -23,20 +20,24 @@ export default function Profil() {
     profilService.get()
       .then((data) => {
         if (!data) return
-        setForm((prev) => ({
-          ...prev,
-          namaUMKM: data.namaUMKM || '',
-          deskripsi: data.deskripsi || '',
-          alamat: data.alamat || '',
-          noTelepon: data.noTelepon || '',
-          email: data.email || '',
-          mediaSosial: data.mediaSosial || '',
-        }))
-        if (data.foto) setPreview(assetUrl(data.foto))
+        setSaved(Object.fromEntries(Object.keys(EMPTY_PROFIL).map((key) => [key, data[key] || ''])))
+        if (data.foto) setSavedPreview(assetUrl(data.foto))
       })
       .catch(() => setMessage({ type: 'error', text: 'Gagal memuat profil.' }))
       .finally(() => setLoading(false))
   }, [])
+
+  const startEdit = () => {
+    setForm({ ...saved, foto: null })
+    setPreview(savedPreview)
+    setMessage({ type: '', text: '' })
+    setEditing(true)
+  }
+
+  const cancelEdit = () => {
+    if (preview !== savedPreview) URL.revokeObjectURL(preview)
+    setEditing(false)
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -48,6 +49,7 @@ export default function Profil() {
     const foto = e.target.files[0]
     if (!foto) return
     setForm((prev) => ({ ...prev, foto }))
+    if (preview !== savedPreview) URL.revokeObjectURL(preview)
     setPreview(URL.createObjectURL(foto))
   }
 
@@ -62,6 +64,8 @@ export default function Profil() {
         if (value !== null && value !== '') payload.append(key, value)
       })
       await profilService.save(payload)
+      setSaved(Object.fromEntries(Object.keys(EMPTY_PROFIL).map((key) => [key, form[key]])))
+      setSavedPreview(preview)
       setMessage({ type: 'success', text: 'Profil berhasil disimpan.' })
       setEditing(false)
     } catch (err) {
@@ -84,30 +88,31 @@ export default function Profil() {
           </div>
         </div>
 
-        {message.text && <div className={`rounded-lg border p-4 text-sm ${message.type === 'success' ? 'border-green-100 bg-green-50 text-green-700' : 'border-red-100 bg-red-50 text-red-700'}`}>{message.text}</div>}
+        {message.text && !editing && <div className={`rounded-lg border p-4 text-sm ${message.type === 'success' ? 'border-green-100 bg-green-50 text-green-700' : 'border-red-100 bg-red-50 text-red-700'}`}>{message.text}</div>}
 
         <section className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100 sm:p-8">
-          {preview && <img src={preview} alt="Foto usaha" className="mb-8 aspect-video w-full rounded-xl object-cover ring-1 ring-gray-200" />}
+          {savedPreview && <img src={savedPreview} alt="Foto usaha" className="mb-8 aspect-video w-full rounded-xl object-cover ring-1 ring-gray-200" />}
           <div className="flex flex-col gap-5 border-b border-gray-100 pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Nama Usaha</p>
-              <h2 className="mt-1 text-xl font-bold text-gray-900">{form.namaUMKM || 'Belum diisi'}</h2>
-              <p className="mt-4 text-sm text-gray-500">{form.deskripsi || 'Deskripsi usaha belum diisi.'}</p>
+              <h2 className="mt-1 text-xl font-bold text-gray-900">{saved.namaUMKM || 'Belum diisi'}</h2>
+              <p className="mt-4 text-sm text-gray-500">{saved.deskripsi || 'Deskripsi usaha belum diisi.'}</p>
             </div>
-            <button type="button" onClick={() => setEditing(true)} className="shrink-0 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">Edit Profil</button>
+            <button type="button" onClick={startEdit} className="shrink-0 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">Edit Profil</button>
           </div>
           <dl className="mt-6 grid gap-x-8 gap-y-6 sm:grid-cols-2">
-            <div><dt className="text-xs font-semibold uppercase text-gray-400">Alamat</dt><dd className="mt-1 text-sm text-gray-700">{form.alamat || '-'}</dd></div>
-            <div><dt className="text-xs font-semibold uppercase text-gray-400">Nomor Telepon</dt><dd className="mt-1 text-sm text-gray-700">{form.noTelepon || '-'}</dd></div>
-            <div><dt className="text-xs font-semibold uppercase text-gray-400">Email Usaha</dt><dd className="mt-1 text-sm text-gray-700">{form.email || '-'}</dd></div>
-            <div><dt className="text-xs font-semibold uppercase text-gray-400">Media Sosial</dt><dd className="mt-1 text-sm text-gray-700">{form.mediaSosial || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Alamat</dt><dd className="mt-1 text-sm text-gray-700">{saved.alamat || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Nomor Telepon</dt><dd className="mt-1 text-sm text-gray-700">{saved.noTelepon || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Email Usaha</dt><dd className="mt-1 text-sm text-gray-700">{saved.email || '-'}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase text-gray-400">Media Sosial</dt><dd className="mt-1 text-sm text-gray-700">{saved.mediaSosial || '-'}</dd></div>
           </dl>
         </section>
 
         {editing && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
           <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl sm:p-8">
-            <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4"><h2 className="text-xl font-bold text-gray-900">Edit Profil UMKM</h2><button type="button" onClick={() => setEditing(false)} className="rounded-lg px-2 text-2xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-600">&times;</button></div>
+            <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4"><h2 className="text-xl font-bold text-gray-900">Edit Profil UMKM</h2><button type="button" onClick={cancelEdit} aria-label="Tutup" className="rounded-lg px-2 text-2xl text-gray-400 transition hover:bg-gray-100 hover:text-gray-600">&times;</button></div>
             <form onSubmit={handleSubmit} className="space-y-5">
+          {message.type === 'error' && <div role="alert" className="rounded-lg border border-red-100 bg-red-50 p-4 text-sm text-red-700">{message.text}</div>}
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Nama Usaha</label>
@@ -126,7 +131,7 @@ export default function Profil() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Nomor Telepon</label>
-              <input name="noTelepon" value={form.noTelepon} onChange={handleChange} required maxLength={20} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="08xxxxxxxxxx" />
+              <input type="tel" inputMode="tel" name="noTelepon" value={form.noTelepon} onChange={handleChange} required maxLength={15} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="08xxxxxxxxxx" />
             </div>
 
             <div>
@@ -136,7 +141,7 @@ export default function Profil() {
 
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700">Media Sosial <span className="text-gray-400">(opsional)</span></label>
-              <input name="mediaSosial" value={form.mediaSosial} onChange={handleChange} maxLength={255} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Instagram, Facebook, atau TikTok" />
+              <input type="url" name="mediaSosial" value={form.mediaSosial} onChange={handleChange} maxLength={255} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="https://instagram.com/namausaha" />
             </div>
 
             <div className="sm:col-span-2">
@@ -146,7 +151,7 @@ export default function Profil() {
             </div>
           </div>
 
-          <div className="flex gap-3"><button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">{saving ? 'Menyimpan...' : 'Simpan Profil'}</button><button type="button" onClick={() => setEditing(false)} className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button></div>
+          <div className="flex gap-3"><button type="submit" disabled={saving} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">{saving ? 'Menyimpan...' : 'Simpan Profil'}</button><button type="button" onClick={cancelEdit} className="rounded-lg border border-gray-300 px-6 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button></div>
             </form>
           </div>
         </div>}
