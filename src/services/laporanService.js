@@ -6,6 +6,12 @@ export const laporanService = {
     return data
   },
 
+  // params: { periode: 'bulanan', tahun } or { periode: 'harian' | 'mingguan', bulan: 'YYYY-MM' }
+  async ringkasan(params) {
+    const { data } = await api.get('/laporan-keuangan/ringkasan', { params })
+    return data
+  },
+
   async getById(id) {
     const { data } = await api.get(`/laporan-keuangan/${id}`)
     return data
