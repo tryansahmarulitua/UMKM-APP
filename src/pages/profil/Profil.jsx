@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { profilService } from '../../services/profilService'
 import { assetUrl } from '../../services/api'
+import { pesanError } from '../../utils/pesanError'
 
 const EMPTY_PROFIL = { namaUMKM: '', deskripsi: '', alamat: '', noTelepon: '', email: '', mediaSosial: '' }
 
@@ -69,8 +70,7 @@ export default function Profil() {
       setMessage({ type: 'success', text: 'Profil berhasil disimpan.' })
       setEditing(false)
     } catch (err) {
-      const errors = err.response?.data?.errors
-      setMessage({ type: 'error', text: errors ? Object.values(errors).flat()[0] : err.response?.data?.message || 'Gagal menyimpan profil.' })
+      setMessage({ type: 'error', text: pesanError(err, 'Gagal menyimpan profil.') })
     } finally {
       setSaving(false)
     }

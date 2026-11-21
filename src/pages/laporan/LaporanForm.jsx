@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import DashboardLayout from '../../layouts/DashboardLayout'
 import { laporanService } from '../../services/laporanService'
+import { pesanError } from '../../utils/pesanError'
 
 export default function LaporanForm() {
   const navigate = useNavigate()
@@ -44,8 +45,7 @@ export default function LaporanForm() {
       if (isEdit) { await laporanService.update(id, form) } else { await laporanService.store(form) }
       navigate('/laporan-keuangan')
     } catch (err) {
-      const errors = err.response?.data?.errors
-      setError(errors ? Object.values(errors).flat()[0] : err.response?.data?.message || 'Gagal menyimpan.')
+      setError(pesanError(err, 'Gagal menyimpan.'))
     } finally {
       setLoading(false)
     }

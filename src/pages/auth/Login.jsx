@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { pesanError } from '../../utils/pesanError'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ export default function Login() {
       await login(formData)
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'Login gagal. Periksa email dan password.')
+      setError(pesanError(err, 'Login gagal. Periksa email dan password.'))
     } finally {
       setLoading(false)
     }
@@ -33,7 +34,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-12">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h1 className="mb-2 text-center text-3xl font-bold text-gray-900">Admin Login</h1>
+        <h1 className="mb-2 text-center text-3xl font-bold text-gray-900">Masuk Admin</h1>
         <p className="mb-6 text-center text-sm text-gray-600">Menu Sedap ala Bunda Riris</p>
 
         {error && (
@@ -80,7 +81,7 @@ export default function Login() {
             disabled={loading}
             className="w-full rounded-md bg-indigo-600 py-2 font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
       </div>
