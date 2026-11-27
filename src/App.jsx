@@ -3,6 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './layouts/ProtectedRoute'
 import GuestRoute from './layouts/GuestRoute'
 import Login from './pages/auth/Login'
+import ForgotPassword from './pages/auth/ForgotPassword'
 import Dashboard from './pages/admin/Dashboard'
 import Produk from './pages/produk/Produk'
 import DaftarLabel from './pages/label/DaftarLabel'
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route element={<GuestRoute />}>
             <Route path="/login" element={<Login />} />
+            <Route path="/lupa-password" element={<ForgotPassword />} />
           </Route>
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />

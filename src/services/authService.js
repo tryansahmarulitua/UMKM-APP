@@ -15,4 +15,19 @@ export const authService = {
     const { data } = await api.get('/auth/me')
     return data
   },
+
+  async kirimOtp(email) {
+    const { data } = await api.post('/auth/forgot-password', { email })
+    return data
+  },
+
+  async verifikasiOtp(email, otp) {
+    const { data } = await api.post('/auth/verify-otp', { email, otp })
+    return data
+  },
+
+  async resetPassword(email, password, password_confirmation) {
+    const { data } = await api.post('/auth/reset-password', { email, password, password_confirmation })
+    return data
+  },
 }
