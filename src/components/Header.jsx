@@ -14,7 +14,7 @@ export default function Header({ onToggleSidebar }) {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between bg-white px-3 shadow sm:px-6">
+    <header className="z-20 flex h-16 shrink-0 items-center justify-between bg-white px-3 shadow sm:px-6">
       <button
         onClick={onToggleSidebar}
         className="rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
